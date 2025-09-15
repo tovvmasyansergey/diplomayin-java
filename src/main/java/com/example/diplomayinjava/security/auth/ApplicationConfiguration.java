@@ -1,5 +1,6 @@
 package com.example.diplomayinjava.security.auth;
 
+import com.example.diplomayinjava.entity.AppUser;
 import com.example.diplomayinjava.repository.AppUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,20 @@ public class ApplicationConfiguration {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return username -> appUserRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return email -> {
+            AppUser user = appUserRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            return CurrentUser.builder()
+                    .id(user.getId())
+                    .lastname(user.getLastname())
+                    .email(user.getEmail())
+                    .role(user.getRole().name())
+                    .phone(user.getPhone())
+                    .password(user.getPassword())
+                    .token(null)
+                    .profilePicture(user.getProfilePicture())
+                    .build();
+        };
     }
 
     @Bean

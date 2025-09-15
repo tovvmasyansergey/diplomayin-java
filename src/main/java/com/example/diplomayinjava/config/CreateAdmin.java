@@ -19,7 +19,7 @@ public class CreateAdmin {
 //    public void initialize() {
 //        AppUser user = new AppUser();
 //       user.setUsername("admin");
-//        user.setEmail("admin@example.com"); // ✅ Подходит под валидацию
+//        user.setEmail("admin@example.com");
 //       user.setPassword(passwordEncoder.encode("admin"));
 //       user.setRole(Role.ADMIN);
 //       appUserRepository.save(user);

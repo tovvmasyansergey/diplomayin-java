@@ -10,19 +10,22 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="username" type="VARCHAR(50)">
-                <constraints nullable="false" unique="true"/>
+            <column name="firstname" type="VARCHAR(50)">
+            </column>
+            <column name="lastname" type="VARCHAR(50)">
             </column>
             <column name="email" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="password" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
             <column name="role" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="verification_code" type="VARCHAR(255)"/>
+            <column name="phone" type="varchar(50)"/>
+            <column name="profile_picture" type="varchar(255)"/>
         </createTable>
     </changeSet>
 

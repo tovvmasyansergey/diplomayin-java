@@ -1,5 +1,6 @@
 package com.example.diplomayinjava.security.auth.service;
 
+import com.example.diplomayinjava.entity.AppUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,22 +30,22 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(AppUser appUser) {
+        return buildToken(appUser);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails);
-    }
-
-    private String buildToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
+    private String buildToken(AppUser appUser) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", appUser.getId());
+        claims.put("firstname", appUser.getFirstname());
+        claims.put("lastname", appUser.getLastname());
+        claims.put("email", appUser.getEmail());
+        claims.put("role", appUser.getRole());
+        claims.put("phone", appUser.getPhone());
+        claims.put("profilePicture", appUser.getProfilePicture());
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();

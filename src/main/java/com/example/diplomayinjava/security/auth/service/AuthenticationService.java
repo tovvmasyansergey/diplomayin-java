@@ -29,8 +29,12 @@ public class AuthenticationService {
 
     public AppUser signup(RegisterUserDto input) {
         AppUser user = new AppUser();
-         user       .setEmail(input.getEmail());
-           user     .setPassword(passwordEncoder.encode(input.getPassword()));
+        user.setLastname(input.getLastname());
+        user.setPhone(input.getPhone());
+        user.setProfilePicture(input.getProfilePicture());
+        user.setFirstname(input.getFirstname());
+        user.setEmail(input.getEmail());
+        user.setPassword(passwordEncoder.encode(input.getPassword()));
 
         return appUserRepository.save(user);
     }

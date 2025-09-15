@@ -1,20 +1,14 @@
 package com.example.diplomayinjava.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class RegisterUserDto {
-    private String email;
+import lombok.Data;
 
-    private String password;
-
+@Data
+public class EditUserRequestDto {
     private String firstname;
-
+    private String email;
     private String lastname;
-
     private String phone;
-
     private String profilePicture;
+
 }
