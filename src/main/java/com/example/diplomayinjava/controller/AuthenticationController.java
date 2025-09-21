@@ -1,7 +1,6 @@
 package com.example.diplomayinjava.controller;
 
 import com.example.diplomayinjava.dto.AuthResponseDto;
-import com.example.diplomayinjava.dto.EditUserRequestDto;
 import com.example.diplomayinjava.dto.LoginUserDto;
 import com.example.diplomayinjava.dto.RegisterUserDto;
 import com.example.diplomayinjava.entity.AppUser;
@@ -9,6 +8,7 @@ import com.example.diplomayinjava.repository.AppUserRepository;
 import com.example.diplomayinjava.security.auth.CurrentUser;
 import com.example.diplomayinjava.security.auth.service.AuthenticationService;
 import com.example.diplomayinjava.security.auth.service.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,7 +24,6 @@ import java.util.Optional;
 @RestController
 public class AuthenticationController {
     private final JwtService jwtService;
-
     private final AuthenticationService authenticationService;
     private final AppUserRepository appUserRepository;
 
@@ -35,19 +34,19 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<AppUser> register(@RequestBody RegisterUserDto registerUserDto) {
-        AppUser registeredUser = authenticationService.signup(registerUserDto);
-
-        return ResponseEntity.ok(registeredUser);
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterUserDto dto) {
+        try {
+            authenticationService.signup(dto);
+            return ResponseEntity.ok("User registered successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping("/edit")
     public ResponseEntity<AppUser> edit(@RequestBody RegisterUserDto registerUserDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-
         if (!currentUser.getUsername().equals(registerUserDto.getEmail())) {
             throw new IllegalArgumentException();
         }

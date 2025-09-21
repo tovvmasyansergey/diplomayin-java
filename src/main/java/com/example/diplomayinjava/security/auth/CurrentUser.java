@@ -19,7 +19,6 @@ public class CurrentUser implements UserDetails {
     private String phone;
     private String token;
     private String profilePicture;
-    private String password;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -27,7 +26,7 @@ public class CurrentUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override
@@ -37,21 +36,21 @@ public class CurrentUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return false;
     }
 }

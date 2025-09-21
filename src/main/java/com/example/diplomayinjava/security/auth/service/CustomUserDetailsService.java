@@ -6,8 +6,10 @@ import com.example.diplomayinjava.security.auth.CurrentUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-public class CustomUserDetailsService  implements UserDetailsService {
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final AppUserRepository appUserRepository;
 
@@ -19,7 +21,6 @@ public class CustomUserDetailsService  implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) {
         AppUser appUser = appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
         return CurrentUser.builder()
                 .id(appUser.getId())
                 .email(appUser.getEmail())

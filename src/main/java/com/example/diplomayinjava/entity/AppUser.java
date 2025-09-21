@@ -47,7 +47,7 @@ public class AppUser {
     private String password;
 
     @Column(name = "verification_code")
-    private String verificationCode;
+    private Boolean verificationCode = false;
 
     private String phone;
 

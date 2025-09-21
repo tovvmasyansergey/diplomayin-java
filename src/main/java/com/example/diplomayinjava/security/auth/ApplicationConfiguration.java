@@ -31,7 +31,6 @@ public class ApplicationConfiguration {
                     .email(user.getEmail())
                     .role(user.getRole().name())
                     .phone(user.getPhone())
-                    .password(user.getPassword())
                     .token(null)
                     .profilePicture(user.getProfilePicture())
                     .build();

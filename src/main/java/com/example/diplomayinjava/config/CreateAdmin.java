@@ -15,15 +15,19 @@ public class CreateAdmin {
     private final PasswordEncoder passwordEncoder;
     private final AppUserRepository appUserRepository;
 
-//    @PostConstruct
-//    public void initialize() {
-//        AppUser user = new AppUser();
-//       user.setUsername("admin");
-//        user.setEmail("admin@example.com");
-//       user.setPassword(passwordEncoder.encode("admin"));
-//       user.setRole(Role.ADMIN);
-//       appUserRepository.save(user);
-//    }
+    @PostConstruct
+    public void initialize() {
+        if (appUserRepository.findByEmail("admin@example.com").isEmpty()) {
+            AppUser user = new AppUser();
+            user.setFirstname("admin");
+            user.setLastname("admin");
+            user.setEmail("admin@example.com");
+            user.setPassword(passwordEncoder.encode("admin"));
+            user.setRole(Role.ADMIN);
+            user.setVerificationCode(true);
+            appUserRepository.save(user);
+        }
+    }
 
 }
 

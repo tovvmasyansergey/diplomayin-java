@@ -23,7 +23,7 @@
             <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="verification_code" type="VARCHAR(255)"/>
+            <column name="verification_code" type="boolean"/>
             <column name="phone" type="varchar(50)"/>
             <column name="profile_picture" type="varchar(255)"/>
         </createTable>
