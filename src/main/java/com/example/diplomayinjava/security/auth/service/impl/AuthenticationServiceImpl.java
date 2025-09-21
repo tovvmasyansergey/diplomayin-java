@@ -4,6 +4,7 @@ import com.example.diplomayinjava.dto.LoginUserDto;
 import com.example.diplomayinjava.dto.RegisterUserDto;
 import com.example.diplomayinjava.entity.AppUser;
 import com.example.diplomayinjava.repository.AppUserRepository;
+import com.example.diplomayinjava.security.auth.CurrentUser;
 import com.example.diplomayinjava.security.auth.service.AuthenticationService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,5 +45,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new BadCredentialsException("Invalid password");
         }
         return user;
+    }
+
+    @Override
+    public AppUser editUser(RegisterUserDto registerUserDto, CurrentUser currentUser) {
+        if (!currentUser.getUsername().equals(registerUserDto.getEmail())) {
+            throw new IllegalArgumentException("You can only edit your own profile");
+        }
+        AppUser appUser = appUserRepository.findByEmail(registerUserDto.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        appUser.setFirstname(registerUserDto.getFirstname());
+        appUser.setLastname(registerUserDto.getLastname());
+        appUser.setPhone(registerUserDto.getPhone());
+        appUser.setProfilePicture(registerUserDto.getProfilePicture());
+        return appUserRepository.save(appUser);
     }
 }

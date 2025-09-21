@@ -4,7 +4,7 @@ import com.example.diplomayinjava.dto.AuthResponseDto;
 import com.example.diplomayinjava.dto.LoginUserDto;
 import com.example.diplomayinjava.dto.RegisterUserDto;
 import com.example.diplomayinjava.entity.AppUser;
-import com.example.diplomayinjava.repository.AppUserRepository;
+import com.example.diplomayinjava.mapper.UserMapper;
 import com.example.diplomayinjava.security.auth.CurrentUser;
 import com.example.diplomayinjava.security.auth.service.AuthenticationService;
 import com.example.diplomayinjava.security.auth.service.JwtService;
@@ -18,19 +18,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
-    private final AppUserRepository appUserRepository;
+    private final UserMapper userMapper;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, AppUserRepository appUserRepository) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserMapper userMapper) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
-        this.appUserRepository = appUserRepository;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/signup")
@@ -44,45 +43,26 @@ public class AuthenticationController {
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<AppUser> edit(@RequestBody RegisterUserDto registerUserDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-        if (!currentUser.getUsername().equals(registerUserDto.getEmail())) {
-            throw new IllegalArgumentException();
+    public ResponseEntity<String> edit(@RequestBody @Valid RegisterUserDto registerUserDto) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            AppUser updatedUser = authenticationService.editUser(registerUserDto, currentUser);
+            return ResponseEntity.ok("User updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating user");
         }
-        Optional<AppUser> byEmail = appUserRepository.findByEmail(registerUserDto.getEmail());
-        AppUser appUser = byEmail.get();
-        appUser.setFirstname(registerUserDto.getFirstname());
-        appUser.setLastname(registerUserDto.getLastname());
-        appUser.setPhone(registerUserDto.getPhone());
-        appUser.setProfilePicture(registerUserDto.getProfilePicture());
-        AppUser registeredUser = appUserRepository.save(appUser);
-
-        return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> authenticate(@RequestBody LoginUserDto loginUserDto) {
-        AppUser authenticate = authenticationService.authenticate(loginUserDto);
-        String jwtToken = jwtService.generateToken(authenticate);
-        CurrentUser currentUser = CurrentUser.builder()
-                        .id(authenticate.getId())
-                        .lastname(authenticate.getLastname())
-                        .email(authenticate.getEmail())
-                        .role(authenticate.getRole().name())
-                        .phone(authenticate.getPhone())
-                        .profilePicture(authenticate.getProfilePicture())
-                        .build();
-        currentUser.setToken(jwtToken);
-        AuthResponseDto authResponseDto = AuthResponseDto.builder()
-                .id(currentUser.getId())
-                .lastname(currentUser.getLastname())
-                .email(currentUser.getEmail())
-                .role(currentUser.getRole())
-                .phone(currentUser.getPhone())
-                .profilePicture(currentUser.getProfilePicture())
-                .token(currentUser.getToken())
-                .build();
+        AppUser authenticatedUser = authenticationService.authenticate(loginUserDto);
+        String jwtToken = jwtService.generateToken(authenticatedUser);
+        AuthResponseDto authResponseDto = userMapper.appUserToAuthResponseDto(authenticatedUser);
+        authResponseDto.setToken(jwtToken);
+        
         return ResponseEntity.ok(authResponseDto);
     }
 }

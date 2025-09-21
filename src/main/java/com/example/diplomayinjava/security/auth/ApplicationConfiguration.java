@@ -1,6 +1,7 @@
 package com.example.diplomayinjava.security.auth;
 
 import com.example.diplomayinjava.entity.AppUser;
+import com.example.diplomayinjava.mapper.UserMapper;
 import com.example.diplomayinjava.repository.AppUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class ApplicationConfiguration {
     private final AppUserRepository appUserRepository;
+    private final UserMapper userMapper;
 
-    public ApplicationConfiguration(AppUserRepository appUserRepository) {
+    public ApplicationConfiguration(AppUserRepository appUserRepository, UserMapper userMapper) {
         this.appUserRepository = appUserRepository;
+        this.userMapper = userMapper;
     }
 
     @Bean
@@ -25,15 +28,9 @@ public class ApplicationConfiguration {
         return email -> {
             AppUser user = appUserRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            return CurrentUser.builder()
-                    .id(user.getId())
-                    .lastname(user.getLastname())
-                    .email(user.getEmail())
-                    .role(user.getRole().name())
-                    .phone(user.getPhone())
-                    .token(null)
-                    .profilePicture(user.getProfilePicture())
-                    .build();
+            CurrentUser currentUser = userMapper.appUserToCurrentUser(user);
+            currentUser.setToken(null);
+            return currentUser;
         };
     }
 
