@@ -31,4 +31,6 @@ public class RegisterUserDto {
     private String phone;
 
     private String profilePicture;
+
+    private String location;
 }

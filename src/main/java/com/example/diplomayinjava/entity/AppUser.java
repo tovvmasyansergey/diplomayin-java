@@ -52,4 +52,6 @@ public class AppUser {
     private String phone;
 
     private String profilePicture;
+
+    private String location;
 }
