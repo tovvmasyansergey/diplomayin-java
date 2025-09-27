@@ -10,6 +10,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -33,6 +37,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setEmail(registerUserDto.getEmail());
         user.setPhone(registerUserDto.getPhone());
         user.setProfilePicture(registerUserDto.getProfilePicture());
+        user.setLocation(registerUserDto.getLocation());
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
         appUserRepository.save(user);
     }
@@ -58,6 +63,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         appUser.setLastname(registerUserDto.getLastname());
         appUser.setPhone(registerUserDto.getPhone());
         appUser.setProfilePicture(registerUserDto.getProfilePicture());
+        appUser.setLocation(registerUserDto.getLocation());
         return appUserRepository.save(appUser);
+    }
+
+    @Override
+    public List<AppUser> getAllUsers() {
+        return appUserRepository.findAll();
+    }
+
+    @Override
+    public Page<AppUser> getAllUsers(Pageable pageable) {
+        return appUserRepository.findAll(pageable);
+    }
+
+    @Override
+    public AppUser editUserById(Long userId, RegisterUserDto registerUserDto) {
+        AppUser appUser = appUserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        
+        if (registerUserDto.getFirstname() != null) {
+            appUser.setFirstname(registerUserDto.getFirstname());
+        }
+        if (registerUserDto.getLastname() != null) {
+            appUser.setLastname(registerUserDto.getLastname());
+        }
+        if (registerUserDto.getEmail() != null) {
+            appUser.setEmail(registerUserDto.getEmail());
+        }
+        if (registerUserDto.getPhone() != null) {
+            appUser.setPhone(registerUserDto.getPhone());
+        }
+        if (registerUserDto.getProfilePicture() != null) {
+            appUser.setProfilePicture(registerUserDto.getProfilePicture());
+        }
+        if (registerUserDto.getLocation() != null) {
+            appUser.setLocation(registerUserDto.getLocation());
+        }
+        
+        return appUserRepository.save(appUser);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        if (!appUserRepository.existsById(userId)) {
+            throw new IllegalArgumentException("User not found with id: " + userId);
+        }
+        appUserRepository.deleteById(userId);
     }
 }

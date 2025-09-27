@@ -2,7 +2,7 @@ spring:
   application:
     name: diplomayin-java
   datasource:
-    url: jdbc:postgresql://localhost:5432/diploma
+    url: jdbc:postgresql://localhost:5432/java
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -31,6 +31,9 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+  web:
+    resources:
+      static-locations: classpath:/static/,file:uploads/
 
 server:
   port: 7404
@@ -41,6 +44,10 @@ hr:
 
 jwt:
   secret: 21321380832109823092382193gifdijg9df8guf9dvjfdiovmkfjeirj98ru489r4rf9ojavndzsief98erwr21
+
+app:
+  upload:
+    dir: uploads
 
 hrspace:
   browseUrl: http://localhost:4200
