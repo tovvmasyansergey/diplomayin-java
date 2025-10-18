@@ -3,6 +3,7 @@ package com.example.diplomayinjava.controller;
 import com.example.diplomayinjava.dto.AuthResponseDto;
 import com.example.diplomayinjava.dto.LoginUserDto;
 import com.example.diplomayinjava.dto.RegisterUserDto;
+import com.example.diplomayinjava.dto.UserDto;
 import com.example.diplomayinjava.entity.AppUser;
 import com.example.diplomayinjava.mapper.UserMapper;
 import com.example.diplomayinjava.security.auth.CurrentUser;
@@ -25,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RequestMapping("/auth")
@@ -129,8 +131,6 @@ public class AuthenticationController {
             dto.setLastname(lastname);
             dto.setPhone(phone);
             dto.setLocation(location);
-            
-            // Если загружено новое фото, сохраняем его
             if (profilePicture != null && !profilePicture.isEmpty()) {
                 String fileUrl = saveProfilePicture(profilePicture);
                 dto.setProfilePicture(fileUrl);
@@ -165,25 +165,18 @@ public class AuthenticationController {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("Only image files are allowed");
         }
-
-        // Создаем директорию, если она не существует
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-
-        // Генерируем уникальное имя файла
         String originalFilename = file.getOriginalFilename();
         String fileExtension = originalFilename != null && originalFilename.contains(".") 
             ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
             : ".jpg";
         String filename = UUID.randomUUID().toString() + fileExtension;
-
-        // Сохраняем файл
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        // Возвращаем URL файла
         return "/uploads/" + filename;
     }
+
 }

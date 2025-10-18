@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
 
@@ -28,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(
             JwtService jwtService,
             CustomUserDetailsService customUserDetailsService,
-            HandlerExceptionResolver handlerExceptionResolver
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = customUserDetailsService;
