@@ -5,6 +5,7 @@ import com.example.diplomayinjava.dto.ChatNotification;
 import com.example.diplomayinjava.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,6 +13,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -84,7 +86,32 @@ public class ChatController {
     }
     
     /**
-     * Получить сообщения между двумя пользователями (точно как в bank)
+     * Получить сообщения между двумя пользователями с пагинацией
+     */
+    @GetMapping("/messages/{senderId}/{recipientId}/paginated")
+    public ResponseEntity<Page<ChatMessageDto>> findChatMessagesWithPagination(
+            @PathVariable String senderId, 
+            @PathVariable String recipientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        try {
+            log.info("📋 Getting paginated chat messages between users: {} and {} (page={}, size={})", senderId, recipientId, page, size);
+            Long senderIdLong = Long.parseLong(senderId);
+            Long recipientIdLong = Long.parseLong(recipientId);
+            log.info("📋 Parsed IDs: sender={}, recipient={}", senderIdLong, recipientIdLong);
+            
+            Page<ChatMessageDto> messages = chatService.getChatMessagesBetweenUsersWithPagination(senderIdLong, recipientIdLong, page, size);
+            log.info("📋 Found {} messages on page {} of {}", messages.getContent().size(), page, messages.getTotalPages());
+            
+            return ResponseEntity.ok(messages);
+        } catch (Exception e) {
+            log.error("❌ Error getting paginated chat messages: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Получить сообщения между двумя пользователями (старый метод для обратной совместимости)
      */
     @GetMapping("/messages/{senderId}/{recipientId}")
     public ResponseEntity<List<ChatMessageDto>> findChatMessages(@PathVariable String senderId, @PathVariable String recipientId) {

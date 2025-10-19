@@ -6,6 +6,9 @@ import com.example.diplomayinjava.entity.Message;
 import com.example.diplomayinjava.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +62,23 @@ public class ChatService {
     }
 
     /**
-     * Найти сообщения между двумя пользователями (точно как в bank)
+     * Найти сообщения между двумя пользователями с пагинацией
+     */
+    @Transactional(readOnly = true)
+    public Page<ChatMessageDto> getChatMessagesBetweenUsersWithPagination(Long userId1, Long userId2, int page, int size) {
+        log.info("📋 Finding messages between users: {} and {} with pagination (page={}, size={})", userId1, userId2, page, size);
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Message> messagePage = messageRepository.findMessagesBetweenUsersWithPagination(userId1, userId2, pageable);
+        
+        log.info("📋 Found {} messages on page {} of {}", messagePage.getContent().size(), page, messagePage.getTotalPages());
+        
+        // Конвертируем Page<Message> в Page<ChatMessageDto>
+        return messagePage.map(this::convertMessageToDto);
+    }
+
+    /**
+     * Найти сообщения между двумя пользователями (старый метод для обратной совместимости)
      */
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getChatMessagesBetweenUsers(Long userId1, Long userId2) {
