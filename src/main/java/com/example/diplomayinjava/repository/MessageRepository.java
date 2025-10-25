@@ -21,7 +21,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
            "(m.sender.id = :userId1 AND m.receiver.id = :userId2) OR " +
            "(m.sender.id = :userId2 AND m.receiver.id = :userId1) " +
-           "ORDER BY m.createdAt DESC")
+           "ORDER BY m.createdAt ASC")
     Page<Message> findMessagesBetweenUsersWithPagination(@Param("userId1") Long userId1, @Param("userId2") Long userId2, Pageable pageable);
     
     // Найти сообщения между двумя пользователями (старый метод для обратной совместимости)

@@ -90,10 +90,10 @@ public class ChatController {
      */
     @GetMapping("/messages/{senderId}/{recipientId}/paginated")
     public ResponseEntity<Page<ChatMessageDto>> findChatMessagesWithPagination(
-            @PathVariable String senderId, 
-            @PathVariable String recipientId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
+            @PathVariable("senderId") String senderId, 
+            @PathVariable("recipientId") String recipientId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size) {
         try {
             log.info("📋 Getting paginated chat messages between users: {} and {} (page={}, size={})", senderId, recipientId, page, size);
             Long senderIdLong = Long.parseLong(senderId);
@@ -114,7 +114,7 @@ public class ChatController {
      * Получить сообщения между двумя пользователями (старый метод для обратной совместимости)
      */
     @GetMapping("/messages/{senderId}/{recipientId}")
-    public ResponseEntity<List<ChatMessageDto>> findChatMessages(@PathVariable String senderId, @PathVariable String recipientId) {
+    public ResponseEntity<List<ChatMessageDto>> findChatMessages(@PathVariable("senderId") String senderId, @PathVariable("recipientId") String recipientId) {
         try {
             log.info("📋 Getting chat messages between users: {} and {}", senderId, recipientId);
             Long senderIdLong = Long.parseLong(senderId);

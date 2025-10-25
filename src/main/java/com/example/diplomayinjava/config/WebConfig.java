@@ -24,7 +24,17 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Обработка загруженных файлов
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/" + uploadDir + "/");
+        
+        // Обработка статических ресурсов (изображения профилей и т.д.)
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+        
+        // Обработка любых других статических файлов
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .setCachePeriod(3600);
     }
 }
