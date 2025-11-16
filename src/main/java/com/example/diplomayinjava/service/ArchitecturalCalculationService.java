@@ -10,16 +10,16 @@ public interface ArchitecturalCalculationService {
     /**
      * Расчет параболической арки
      */
-    public ArchitecturalCalculation calculateParabola(double span, double height, double thickness, Material material);
+    ArchitecturalCalculation calculateParabola(double span, double height, double thickness, Material material);
 
     /**
      * Расчет эллиптического купола
      */
-    public ArchitecturalCalculation calculateEllipse(double a, double b, double thickness, Material material);
+    ArchitecturalCalculation calculateEllipse(double a, double b, double thickness, Material material);
 
     /**
      * Расчет гиперболической башни
      */
-    public ArchitecturalCalculation calculateHyperbola(double a, double b, double thickness, Material material);
+    ArchitecturalCalculation calculateHyperbola(double a, double b, double thickness, Material material);
 }
 

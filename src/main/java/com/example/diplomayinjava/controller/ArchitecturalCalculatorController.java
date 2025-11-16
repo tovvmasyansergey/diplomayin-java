@@ -4,17 +4,17 @@ import com.example.diplomayinjava.dto.ArchitecturalRequest;
 import com.example.diplomayinjava.model.ArchitecturalCalculation;
 import com.example.diplomayinjava.model.Material;
 import com.example.diplomayinjava.service.ArchitecturalCalculationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/architectural")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class ArchitecturalCalculatorController {
 
-    @Autowired
-    private ArchitecturalCalculationService calculationService;
+    private final ArchitecturalCalculationService calculationService;
 
     /**
      * Расчет архитектурной конструкции

@@ -51,20 +51,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("UserController is working!");
-    }
-
-    @GetMapping("/users/test")
-    public ResponseEntity<String> testUsers() {
-        try {
-            List<AppUser> users = authenticationService.getAllUsers();
-            return ResponseEntity.ok("Found " + users.size() + " users: " + 
-                users.stream().map(u -> u.getId() + ":" + u.getEmail()).collect(Collectors.joining(", ")));
-        } catch (Exception e) {
-            return ResponseEntity.ok("Error: " + e.getMessage());
-        }
-    }
 }
