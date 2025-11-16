@@ -69,14 +69,11 @@ public class ChatController {
                 
                 log.info("📤 Sending notification to user {}: {}", savedMessage.getReceiverId(), notification);
                 
-                // Отправляем получателю (точно как в bank)
-            messagingTemplate.convertAndSendToUser(
-                    savedMessage.getReceiverId().toString(),
-                    "/queue/messages",
-                        notification
-                );
+                // Отправляем получателю через общий топик (проще и надежнее)
+                String destination = "/topic/user/" + savedMessage.getReceiverId();
+                messagingTemplate.convertAndSend(destination, notification);
                 
-                log.info("✅ Message notification sent to user: {}", savedMessage.getReceiverId());
+                log.info("✅ Message notification sent to topic: {}", destination);
             } else {
                 log.warn("⚠️ No receiver ID, cannot send notification");
             }
