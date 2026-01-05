@@ -2,9 +2,7 @@ package com.example.diplomayinjava.service;
 
 import com.example.diplomayinjava.model.ArchitecturalCalculation;
 import com.example.diplomayinjava.model.Material;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface ArchitecturalCalculationService {
 
     /**
