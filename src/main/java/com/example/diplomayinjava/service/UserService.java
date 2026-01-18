@@ -6,3 +6,4 @@ public interface UserService {
 
     AppUser findById(Long id);
 }
+

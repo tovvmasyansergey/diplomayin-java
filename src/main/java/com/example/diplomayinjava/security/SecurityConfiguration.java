@@ -36,14 +36,13 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/signup", "/auth/users", "/auth/edit/**", "/auth/delete/**").permitAll() // login, register, получение, редактирование и удаление пользователей публичные
+                        .requestMatchers("/auth/login", "/auth/signup").permitAll() // только login и регистрация публичные
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll() // статические файлы доступны всем
-                        .requestMatchers("/ws/**").permitAll() // WebSocket endpoints
-                        .requestMatchers("/api/chat/**").permitAll() // Chat API доступен всем
+                        .requestMatchers("/ws/**").permitAll() // WebSocket endpoints (авторизация проверяется внутри)
                         .requestMatchers("OPTIONS", "/**").permitAll() // Разрешить все OPTIONS запросы для CORS
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated() // все остальные запросы требуют авторизации
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -56,8 +55,14 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Разрешить конкретные origins
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200"));
+        // Разрешить конкретные origins (включая сетевой доступ)
+        // Используем allowedOriginPatterns для поддержки динамических IP адресов
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://192.168.*.*:*",
+                "http://10.*.*.*:*"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

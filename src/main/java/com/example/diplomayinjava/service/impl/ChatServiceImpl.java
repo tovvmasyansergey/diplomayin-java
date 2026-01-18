@@ -36,6 +36,12 @@ public class ChatServiceImpl implements ChatService {
         log.info("💬 Sending message: {}", messageDto);
         log.info("SenderId: {}, ReceiverId: {}", messageDto.getSenderId(), messageDto.getReceiverId());
 
+        // Проверка: пользователь не может писать сам себе
+        if (messageDto.getSenderId().equals(messageDto.getReceiverId())) {
+            log.warn("⚠️ User {} attempted to send message to themselves", messageDto.getSenderId());
+            throw new IllegalArgumentException("Cannot send message to yourself");
+        }
+
         // Получаем отправителя и получателя
         AppUser sender = userService.findById(messageDto.getSenderId());
         AppUser receiver = userService.findById(messageDto.getReceiverId());

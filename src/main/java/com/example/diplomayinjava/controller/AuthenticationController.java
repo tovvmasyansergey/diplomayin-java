@@ -4,6 +4,7 @@ import com.example.diplomayinjava.dto.AuthResponseDto;
 import com.example.diplomayinjava.dto.LoginUserDto;
 import com.example.diplomayinjava.dto.RegisterUserDto;
 import com.example.diplomayinjava.entity.AppUser;
+import com.example.diplomayinjava.entity.Role;
 import com.example.diplomayinjava.mapper.UserMapper;
 import com.example.diplomayinjava.security.auth.CurrentUser;
 import com.example.diplomayinjava.security.auth.service.AuthenticationService;
@@ -87,8 +88,14 @@ public class AuthenticationController {
     @PostMapping("/edit")
     public ResponseEntity<String> edit(@RequestBody @Valid RegisterUserDto registerUserDto) {
         try {
+            // Проверка авторизации
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof CurrentUser)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+            
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            // В сервисе уже есть проверка, что пользователь может редактировать только свой профиль
             AppUser updatedUser = authenticationService.editUser(registerUserDto, currentUser);
             return ResponseEntity.ok("User updated successfully");
         } catch (IllegalArgumentException e) {
@@ -131,6 +138,19 @@ public class AuthenticationController {
             @RequestParam(value = "location", required = false) String location,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
+            // Проверка авторизации
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof CurrentUser)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+            
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            
+            // Проверка: пользователь может редактировать только себя (админ не может редактировать других)
+            if (!currentUser.getId().equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only edit your own profile");
+            }
+            
             RegisterUserDto dto = new RegisterUserDto();
             dto.setEmail(email);
             dto.setFirstname(firstname);
@@ -155,6 +175,20 @@ public class AuthenticationController {
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         try {
+            // Проверка авторизации
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof CurrentUser)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+            
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            Role currentUserRole = Role.fromName(currentUser.getRole());
+            
+            // Проверка: админ может удалять всех, пользователь может удалить только себя
+            if (!currentUserRole.isAdmin() && !currentUser.getId().equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only delete your own account");
+            }
+            
             authenticationService.deleteUser(userId);
             return ResponseEntity.ok("User deleted successfully");
         } catch (IllegalArgumentException e) {
